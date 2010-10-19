@@ -36,11 +36,13 @@ class Recipe(object):
 
     def install(self):
         """Installer"""
-        return set([self.patcher(patch) for patch in self.patches])
+        for patch in self.patches:
+            self.patcher(patch)
+        return ()
 
     def update(self):
         """Updater"""
-        pass
+        return ()
 
     @staticmethod
     def get_patches(options):
@@ -69,7 +71,7 @@ class Recipe(object):
             return self.use_patch_library
         else:
             return self.use_patch_binary
-        
+
 
     def egg_or_path(self, options):
         """Decides whether to apply patches to eggs or paths."""
