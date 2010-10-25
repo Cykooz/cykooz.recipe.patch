@@ -37,7 +37,10 @@ class Recipe(object):
     def install(self):
         """Installer"""
         for patch in self.patches:
-            self.patcher(patch)
+            try:
+                self.patcher(patch)
+            except Exception, e:
+                logger.warn(str(e))
         return ()
 
     def update(self):
