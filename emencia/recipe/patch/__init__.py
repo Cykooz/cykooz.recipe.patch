@@ -101,17 +101,28 @@ class Recipe(object):
         """Applies a `patch` to `path` using an external binary."""
         logger.info('reading patch %s' % patch)
         logger.info('in %s...' % path)
+
+        # Call
         command = ['patch', '-p0', '-N']
         p = Popen(command, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
                   close_fds=True, cwd=path)
         output = p.communicate(open(patch).read())[0]
-        [logger.info(line) for line in output.strip().split('\n')]
+
+        # Log
+        output = output.strip()
+        for line in output.strip().split('\n'):
+            logger.info(line)
+
+        # Ok
         if p.returncode == 0:
             return path
 
         # XXX "patch -N" is broken actually...
         # See http://unix.stackexchange.com/questions/65698/how-to-make-patch-ignore-already-applied-hunks
-        if p.returncode == 1:
+        already = 'Reversed (or previously applied) patch detected!' in output
+        if p.returncode == 1 and already is True:
+            logger.warn("Patch already applied, or something worse?")
             return path
 
+        # Error
         raise zc.buildout.UserError('could not apply %s' % patch)
