@@ -4,10 +4,10 @@ This module contains the tool of emencia.recipe.patch
 """
 from setuptools import setup, find_packages
 
-version = '1.0'
+version = '0.1'
 
 long_description = (
-    open('README.txt').read() + '\n'
+    open('README.rst').read() + '\n'
     + '\n' +
    'Download\n'
     '********\n'

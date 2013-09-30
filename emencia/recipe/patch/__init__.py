@@ -106,6 +106,12 @@ class Recipe(object):
                   close_fds=True, cwd=path)
         output = p.communicate(open(patch).read())[0]
         [logger.info(line) for line in output.strip().split('\n')]
-        if p.returncode != 0:
-            raise zc.buildout.UserError('could not apply %s' % patch)
-        return path
+        if p.returncode == 0:
+            return path
+
+        # XXX "patch -N" is broken actually...
+        # See http://unix.stackexchange.com/questions/65698/how-to-make-patch-ignore-already-applied-hunks
+        if p.returncode == 1:
+            return path
+
+        raise zc.buildout.UserError('could not apply %s' % patch)

@@ -258,10 +258,12 @@ Running the buildout gives us:
 Changes
 =======
 
-1.0 (unreleased)
+0.1 (unreleased)
 ----------------
 
 Fork of collective.recipe.patch, changes:
 
 - Drop built-in patch, use only the ``patch`` external binary.
   Option patch-binary removed.
+
+- Ignore patches already applied
