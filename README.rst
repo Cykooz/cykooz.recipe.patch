@@ -1,5 +1,11 @@
-.. contents::
 
+This is a fork of ``collective.recipe.patch``. Main differences are:
+
+- Drop built-in implementation of the patch command. Drop the
+  ``patch-binary`` option. Instead calls to the ``patch`` is hard-coded.
+
+- Ignore patches already applied. To do so we pass the ``-N`` parameter
+  to the ``patch`` command.
 
 Links:
 
@@ -253,17 +259,3 @@ Running the buildout gives us:
 
     >>> cat(sample_buildout, 'develop-eggs', demoegg, 'demo.py')
     # demo egg
-
-
-Changes
-=======
-
-0.1 (unreleased)
-----------------
-
-Fork of collective.recipe.patch, changes:
-
-- Drop built-in patch, use only the ``patch`` external binary.
-  Option patch-binary removed.
-
-- Ignore patches already applied
