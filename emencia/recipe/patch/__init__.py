@@ -33,10 +33,7 @@ class Recipe(object):
     def install(self):
         """Installer"""
         for patch in self.patches:
-            try:
-                self.patcher(patch)
-            except Exception, e:
-                logger.warn(str(e))
+            self.patcher(patch)
         return ()
 
     def update(self):
@@ -104,15 +101,11 @@ class Recipe(object):
         """Applies a `patch` to `path` using an external binary."""
         logger.info('reading patch %s' % patch)
         logger.info('in %s...' % path)
-        cwd = os.getcwd()
-        try:
-            os.chdir(path)
-            p = Popen(['patch', '-p0'], stdin=PIPE, stdout=PIPE,
-                      stderr=STDOUT, close_fds=True)
-            output = p.communicate(open(patch).read())[0]
-            [logger.info(line) for line in output.strip().split('\n')]
-            if p.returncode != 0:
-                raise zc.buildout.UserError('could not apply %s' % patch)
-        finally:
-            os.chdir(cwd)
+        command = ['patch', '-p0', '-N']
+        p = Popen(command, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
+                  close_fds=True, cwd=path)
+        output = p.communicate(open(patch).read())[0]
+        [logger.info(line) for line in output.strip().split('\n')]
+        if p.returncode != 0:
+            raise zc.buildout.UserError('could not apply %s' % patch)
         return path
