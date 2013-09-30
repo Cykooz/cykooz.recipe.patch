@@ -107,9 +107,8 @@ class Recipe(object):
         cwd = os.getcwd()
         try:
             os.chdir(path)
-            p = Popen([self.binary, '-p0'],
-                      stdin=PIPE, stdout=PIPE, stderr=STDOUT,
-                      close_fds=True)
+            p = Popen(['patch', '-p0'], stdin=PIPE, stdout=PIPE,
+                      stderr=STDOUT, close_fds=True)
             output = p.communicate(open(patch).read())[0]
             [logger.info(line) for line in output.strip().split('\n')]
             if p.returncode != 0:

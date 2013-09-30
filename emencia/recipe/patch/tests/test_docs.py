@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Doctest runner for 'collective.recipe.patch'.
+Doctest runner for 'emencia.recipe.patch'.
 """
 __docformat__ = 'restructuredtext'
 
@@ -19,7 +19,7 @@ def setUp(test):
 
     # Install the recipe in develop mode
     zc.buildout.testing.install_develop('zc.recipe.egg', test)
-    zc.buildout.testing.install_develop('collective.recipe.patch', test)
+    zc.buildout.testing.install_develop('emencia.recipe.patch', test)
 
 def test_suite():
     suite = unittest.TestSuite((

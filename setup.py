@@ -1,40 +1,23 @@
 # -*- coding: utf-8 -*-
 """
-This module contains the tool of collective.recipe.patch
+This module contains the tool of emencia.recipe.patch
 """
-import os
 from setuptools import setup, find_packages
 
-def read(*rnames):
-    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
-
-version = '0.2.3'
+version = '1.0'
 
 long_description = (
-    read('README.txt') + '\n'
-    'Detailed Documentation\n'
-    '**********************\n\n' +
-    read('collective', 'recipe', 'patch', 'README.txt')
-    + '\n' +
-    'Contributors\n' 
-    '************\n'
-    + '\n' +
-    read('CONTRIBUTORS.txt')
-    + '\n' +
-    'Change history\n'
-    '**************\n'
-    + '\n' + 
-    read('CHANGES.txt')
+    open('README.txt').read() + '\n'
     + '\n' +
    'Download\n'
     '********\n'
     )
-entry_point = 'collective.recipe.patch:Recipe'
+entry_point = 'emencia.recipe.patch:Recipe'
 entry_points = {"zc.buildout": ["default = %s" % entry_point]}
 
 tests_require=['zope.testing', 'zc.buildout']
 
-setup(name='collective.recipe.patch',
+setup(name='emencia.recipe.patch',
       version=version,
       description="recipe for patching eggs",
       long_description=long_description,
@@ -49,10 +32,12 @@ setup(name='collective.recipe.patch',
       keywords='buildout recipe patch',
       author='Rok Garbas',
       author_email='rok.garbas@gmail.com',
-      url='http://github.com/garbas/collective.recipe.patch',
+      maintainer='J. David Ibanez',
+      maintainer_email='jdavid@emencia.com',
+      url='http://github.com/emencia/emencia.recipe.patch',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
-      namespace_packages=['collective', 'collective.recipe'],
+      namespace_packages=['emencia', 'emencia.recipe'],
       include_package_data=True,
       install_requires=['setuptools',
                         'zc.buildout',
@@ -61,7 +46,7 @@ setup(name='collective.recipe.patch',
                         ],
       tests_require=tests_require,
       extras_require=dict(tests=tests_require),
-      test_suite = 'collective.recipe.patch.tests.test_docs.test_suite',
+      test_suite = 'emencia.recipe.patch.tests.test_docs.test_suite',
       entry_points=entry_points,
       zip_safe = True,
       )
