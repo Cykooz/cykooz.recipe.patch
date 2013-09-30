@@ -150,48 +150,6 @@ Running the buildout gives us:
     >>> cat(sample_buildout, 'develop-eggs', demoegg, 'demo.py')
     # patching
 
-External binaries
------------------
-
-We can also set an external binary to use for patching:
-
-    >>> write(sample_buildout, 'buildout.cfg',
-    ... """
-    ... [buildout]
-    ... parts = demo-patch
-    ... index = demo/dist/
-    ...
-    ... [demo-patch]
-    ... recipe = collective.recipe.patch
-    ... patch-binary = patch
-    ... egg = demo==1.0
-    ... patches = demo.patch
-    ... """)
-
-Running the buildout gives us:
-
-    >>> print system(buildout)
-    Not found: demo/dist/...
-    ...
-    Installing demo-patch.
-    ...
-    Getting distribution for 'demo==1.0'.
-    Got demo 1.0.
-    patch: reading patch .../demo.patch
-    ...
-    patch: patching file demo.py
-
-    >>> ls(sample_buildout, 'develop-eggs', demoegg)
-    d  EGG-INFO
-    -  demo.py
-    -  demo.pyc
-    -  demo.pyo
-    >>> cat(sample_buildout, 'demo', 'demo.py')
-    # demo egg
-    >>> cat(sample_buildout, 'develop-eggs', demoegg, 'demo.py')
-    # demo egg
-    # patching
-
 Patching an egg installed in another part
 -----------------------------------------
 
@@ -273,40 +231,6 @@ subsequent patches, letting you fix the problem:
 
 Running the buildout gives us:
 
-    >>> print system(buildout)
-    Not found: demo/dist/...
-    ...
-    Installing demo-patch.
-    ...
-    Getting distribution for 'demo==1.0'.
-    Got demo 1.0.
-    patch: reading patch .../missing-file.patch
-    ...
-    patch: source/target file does not exist
-    --- .../missing-file.py
-    +++ .../missing-file.py
-    While:
-      Installing demo-patch.
-    Error: could not apply .../missing-file.patch
-
-    >>> cat(sample_buildout, 'develop-eggs', demoegg, 'demo.py')
-    # demo egg
-
-Or when using an external binary:
-
-    >>> write(sample_buildout, 'buildout.cfg',
-    ... """
-    ... [buildout]
-    ... parts = demo-patch
-    ... index = demo/dist/
-    ...
-    ... [demo-patch]
-    ... recipe = collective.recipe.patch
-    ... patch-binary = patch
-    ... egg = demo==1.0
-    ... patches = missing-file.patch
-    ...           demo.patch
-    ... """)
     >>> print system(buildout)
     Not found: demo/dist/...
     ...
