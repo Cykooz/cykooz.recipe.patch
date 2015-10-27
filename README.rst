@@ -1,16 +1,12 @@
 
-This is a fork of ``collective.recipe.patch``. Main differences are:
+This is a fork of ``emencia.recipe.patch``. Main differences are:
 
-- Drop built-in implementation of the patch command. Drop the
-  ``patch-binary`` option. Instead calls to the ``patch`` is hard-coded.
-
-- Ignore patches already applied. To do so we pass the ``-N`` parameter
-  to the ``patch`` command.
+- Added Python 3 support.
 
 Links:
 
-- https://pypi.python.org/pypi/emencia.recipe.patch - Download
-- https://github.com/emencia/emencia.recipe.patch - Source code
+- https://pypi.python.org/pypi/cykooz.recipe.patch - Download
+- https://github.com/cykooz/cykooz.recipe.patch - Source code
 
 
 Supported options
@@ -57,7 +53,7 @@ Our demo package which we will patch:
     ...     py_modules=['demo']
     ...     )
     ... """)
-    >>> print system(buildout+' setup demo bdist_egg'), # doctest: +ELLIPSIS
+    >>> print_(system(buildout + ' setup demo bdist_egg')) # doctest: +ELLIPSIS
     Running setup script 'demo/setup.py'.
     ...
 
@@ -81,7 +77,7 @@ Let's write out buildout.cfg to patch our demo package:
     ... index = demo/dist/
     ...
     ... [demo-patch]
-    ... recipe = emencia.recipe.patch
+    ... recipe = cykooz.recipe.patch
     ... egg = demo==1.0
     ... patches = demo.patch
     ... """)
@@ -93,16 +89,15 @@ Our final egg name depends on current python version:
 
 Running the buildout gives us:
 
-    >>> print system(buildout)
-    Not found: demo/dist/...
-    ...
+    >>> print_(system(buildout))
     Installing demo-patch.
-    ...
     Getting distribution for 'demo==1.0'.
     Got demo 1.0.
     patch: reading patch .../demo.patch
     ...
-    patch: successfully patched ...develop-eggs/demo-1.0-py...egg/demo.py
+    patch: patching file demo.py
+    patch: successfully patched .../demo-1.0...
+    ...
 
     >>> ls(sample_buildout, 'develop-eggs', demoegg)
     d  EGG-INFO
@@ -139,7 +134,7 @@ another.patch should be applied after demo.patch:
     ... index = demo/dist/
     ...
     ... [demo-patch]
-    ... recipe = emencia.recipe.patch
+    ... recipe = cykooz.recipe.patch
     ... egg = demo==1.0
     ... patches =
     ...     demo.patch
@@ -148,19 +143,22 @@ another.patch should be applied after demo.patch:
 
 Running the buildout gives us:
 
-    >>> print system(buildout)
-    Not found: demo/dist/...
-    ...
+    >>> rmdir(sample_buildout, 'develop-eggs', demoegg)
+    >>> remove(sample_buildout, '.installed.cfg')
+    >>> _ = system(buildout + ' setup demo bdist_egg')
+    >>> print_(system(buildout))
     Installing demo-patch.
-    ...
     Getting distribution for 'demo==1.0'.
     Got demo 1.0.
     patch: reading patch .../demo.patch
     ...
-    patch: successfully patched ...develop-eggs/demo-1.0-py...egg/demo.py
+    patch: patching file demo.py
+    patch: successfully patched .../demo-1.0...
     patch: reading patch .../another.patch
     ...
-    patch: successfully patched ...develop-eggs/demo-1.0-py...egg/demo.py
+    patch: patching file demo.py
+    patch: successfully patched .../demo-1.0...
+    ...
 
     >>> cat(sample_buildout, 'develop-eggs', demoegg, 'demo.py')
     # patching
@@ -182,26 +180,27 @@ eggs-folder instead the develop-eggs folder.
     ... [demo-egg]
     ... recipe = zc.recipe.egg
     ... eggs = demo==1.0
-    ... unzip = true
     ...
     ... [demo-patch]
-    ... recipe = emencia.recipe.patch
+    ... recipe = cykooz.recipe.patch
     ... egg = ${demo-egg:eggs}
     ... patches = demo.patch
     ... """)
 
 Running the buildout gives us:
 
-    >>> print system(buildout)
-    Not found: demo/dist/...
-    ...
+    >>> rmdir(sample_buildout, 'develop-eggs', demoegg)
+    >>> remove(sample_buildout, '.installed.cfg')
+    >>> _ = system(buildout + ' setup demo bdist_egg')
+    >>> print_(system(buildout))
     Installing demo-egg.
-    ...
     Getting distribution for 'demo==1.0'.
     Got demo 1.0.
     Installing demo-patch.
+    patch: reading patch .../demo.patch
     ...
-    patch: successfully patched ...eggs/demo-1.0-py...egg/demo.py
+    patch: patching file demo.py
+    patch: successfully patched .../demo-1.0...
 
     >>> ls(sample_buildout, 'eggs', demoegg)
     d  EGG-INFO
@@ -215,7 +214,7 @@ Running the buildout gives us:
     # patching
 
 Broken patches
-----------------
+--------------
 
 If one of the patches is broken:
 
@@ -238,7 +237,7 @@ subsequent patches, letting you fix the problem:
     ... index = demo/dist/
     ...
     ... [demo-patch]
-    ... recipe = emencia.recipe.patch
+    ... recipe = cykooz.recipe.patch
     ... egg = demo==1.0
     ... patches = missing-file.patch
     ...           demo.patch
@@ -246,13 +245,19 @@ subsequent patches, letting you fix the problem:
 
 Running the buildout gives us:
 
-    >>> print system(buildout)
-    Not found: demo/dist/...
-    ...
+    >>> rmdir(sample_buildout, 'eggs', demoegg)
+    >>> remove(sample_buildout, '.installed.cfg')
+    >>> _ = system(buildout + ' setup demo bdist_egg')
+    >>> print_(system(buildout))
     Installing demo-patch.
+    Getting distribution for 'demo==1.0'.
+    Got demo 1.0.
     patch: reading patch .../missing-file.patch
     ...
+    patch: The next patch would delete the file missing-file.py,
+    patch: which does not exist!  Skipping patch.
     patch: patch: **** malformed patch at line 6:
+    ...
     While:
       Installing demo-patch.
     Error: could not apply .../missing-file.patch

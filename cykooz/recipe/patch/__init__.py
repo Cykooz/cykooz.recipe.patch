@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
-
 """Recipe for applying patches"""
-
 import logging
-logger = logging.getLogger('patch')
-
-from hashlib import sha1
 import os
+from hashlib import sha1
 from subprocess import Popen, PIPE, STDOUT
 
 import zc.buildout
 import zc.recipe.egg
+
+
+logger = logging.getLogger('patch')
 
 
 class Recipe(object):
@@ -56,7 +55,9 @@ class Recipe(object):
         """Yields (pathname, SHA1 digest) for each file in `patches`."""
         for patch in patches:
             try:
-                yield (patch, sha1(open(patch).read()).hexdigest())
+                data = open(patch).read()
+                data = data.encode()
+                yield (patch, sha1(data).hexdigest())
             except IOError:
                 raise zc.buildout.UserError('Patch cannot be read: %s' % patch)
 
@@ -78,13 +79,14 @@ class Recipe(object):
             links = tuple(links.split('\n'))
         ws = zc.buildout.easy_install.install(
             [egg], self.options['develop-eggs-directory'],
-            links           = links,
-            index           = self.buildout['buildout'].get('index'),
-            executable      = self.options['executable'],
-            path            = [self.options['eggs-directory']],
-            newest          = self.buildout['buildout'].get('newest') == 'true',
-            allow_hosts     = self.buildout['buildout'].get('allow-hosts', '*'),
-            always_unzip    = 'true', )
+            links=links,
+            index=self.buildout['buildout'].get('index'),
+            executable=self.options['executable'],
+            path=[self.options['eggs-directory']],
+            newest=self.buildout['buildout'].get('newest') == 'true',
+            allow_hosts=self.buildout['buildout'].get('allow-hosts', '*'),
+            always_unzip='true'
+        )
         return ws.require(egg)[0].location
 
     def patch_egg(self, patch):
@@ -103,18 +105,20 @@ class Recipe(object):
         logger.info('in %s...' % path)
 
         # Call
-        command = ['patch', '-p0', '-N']
+        command = ['patch', '-p0', '-N', '-r', '-']
         p = Popen(command, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
                   close_fds=True, cwd=path)
-        output = p.communicate(open(patch).read())[0]
+        output = p.communicate(open(patch).read().encode())[0]
 
         # Log
-        output = output.strip()
-        for line in output.strip().split('\n'):
+        output = output.decode().strip()
+        lines = output.split('\n')
+        for line in lines:
             logger.info(line)
 
         # Ok
         if p.returncode == 0:
+            logger.warn("successfully patched %s" % path)
             return path
 
         # XXX "patch -N" is broken actually...
